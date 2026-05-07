@@ -1,0 +1,24 @@
+# 虚拟环境目录
+Scripts/
+Lib/
+Include/
+pyvenv.cfg
+
+# IDE配置
+.idea/
+.vscode/
+
+# 缓存和编译文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 数据库文件
+*.db
+
+# 日志文件
+*.log
+
+# 环境变量
+.env

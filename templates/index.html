@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		.form-container {
+		    background-color: white;
+		    padding: 40px;
+		    border-radius: 12px;
+		    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+		}
+
+		.form-container h2 {
+		    text-align: center;
+		    margin-bottom: 30px;
+		    color: #1f2937;
+		}
+
+		.form-group {
+		    margin-bottom: 20px;
+		}
+
+		.form-group label {
+		    display: block;
+		    margin-bottom: 8px;
+		    color: #374151;
+		    font-size: 14px;
+		}
+
+		.form-group input, .form-group textarea, .form-group select {
+		    width: 100%;
+		    padding: 12px;
+		    border: 1px solid #d1d5db;
+		    border-radius: 6px;
+		    font-size: 14px;
+		}
+
+		.form-group textarea {
+		    height: 100px;
+		    resize: vertical;
+		}
+
+		.btn-submit {
+		    width: 100%;
+		    padding: 14px;
+		    background-color: #2563eb;
+		    color: white;
+		    border: none;
+		    border-radius: 6px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    margin-top: 10px;
+		}
+
+		.btn-submit:hover {
+		    background-color: #1d4ed8;
+		}
+
+		.link {
+		    text-align: center;
+		    margin-top: 20px;
+		    font-size: 14px;
+		    color: #6b7280;
+		}
+
+		.link a {
+		    color: #2563eb;
+		    text-decoration: none;
+		}
+
+		.my-questions h2 {
+		    text-align: center;
+		    margin-bottom: 30px;
+		    color: #1f2937;
+		}
+
+		.my-questions .empty {
+		    text-align: center;
+		    color: #9ca3af;
+		    margin-bottom: 20px;
+		}
+
+		.btn-create {
+		    display: block;
+		    width: 200px;
+		    margin: 0 auto;
+		    padding: 12px;
+		    background-color: #2563eb;
+		    color: white;
+		    text-align: center;
+		    border-radius: 6px;
+		    text-decoration: none;
+		}
+
+		.question-detail {
+		    max-width: 800px;
+		    margin: 0 auto;
+		}
+
+		.detail-header {
+		    position: relative;
+		    height: 300px;
+		    border-radius: 12px;
+		    overflow: hidden;
+		    margin-bottom: 30px;
+		}
+
+		.detail-header img {
+		    width: 100%;
+		    height: 100%;
+		    object-fit: cover;
+		}
+
+		.header-info {
+		    position: absolute;
+		    top: 20px;
+		    right: 20px;
+		    display: flex;
+		    gap: 10px;
+		}
+
+		.detail-content h1 {
+		    font-size: 28px;
+		    color: #1f2937;
+		    margin-bottom: 15px;
+		}
+
+		.detail-content .meta {
+		    margin-bottom: 20px;
+		}
+
+		.description {
+		    color: #4b5563;
+		    line-height: 1.8;
+		    margin-bottom: 30px;
+		}
+
+		.actions {
+		    display: flex;
+		    gap: 20px;
+		}
+
+		.btn-back {
+		    background-color: white;
+		    color: #374151;
+		    padding: 10px 20px;
+		    border: 1px solid #d1d5db;
+		    border-radius: 6px;
+		    text-decoration: none;
+		    font-size: 14px;
+		}
+
+		.btn-back:hover {
+		    background-color: #f9fafb;
+		}
+
+		footer {
+		    background-color: #1f2937;
+		    color: #9ca3af;
+		    padding: 50px 20px;
+		    margin-top: auto;
+		}
+
+		.footer-container {
+		    max-width: 1200px;
+		    margin: 0 auto;
+		    display: grid;
+		    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		    gap: 30px;
+		}
+
+		.footer-section h4 {
+		    color: white;
+		    margin-bottom: 20px;
+		}
+
+		.footer-section ul {
+		    list-style: none;
+		}
+
+		.footer-section ul li {
+		    margin-bottom: 10px;
+		}
+
+		.footer-section ul li a {
+		    color: #9ca3af;
+		    text-decoration: none;
+		}
+
+		.footer-section ul li a:hover {
+		    color: white;
+		}
+
+		.footer-section p {
+		    margin-bottom: 15px;
+		    line-height: 1.6;
+		}
+
+		.subscribe {
+		    display: flex;
+		    margin-top: 10px;
+		}
+
+		.subscribe input {
+		    flex: 1;
+		    padding: 12px;
+		    border: none;
+		    border-radius: 6px 0 0 6px;
+		    font-size: 14px;
+		}
+
+		.subscribe button {
+		    padding: 12px 18px;
+		    background-color: #2563eb;
+		    color: white;
+		    border: none;
+		    border-radius: 0 6px 6px 0;
+		    cursor: pointer;
+		    font-size: 16px;
+		}
+
+		.copyright {
+		    text-align: center;
+		    padding-top: 30px;
+		    margin-top: 30px;
+		    border-top: 1px solid #374151;
+		    font-size: 14px;
+		}
+	</style>
+</head>
+<body>
+	<footer>
+	        <div class="footer-container">
+	            <div class="footer-section">
+	                <div class="logo">
+	                    <img src="https://img.icons8.com/color/48/000000/survey.png" alt="问卷广场">
+	                    <span>问卷广场</span>
+	                </div>
+	                <p>专业的在线问卷与投票平台，让每一个声音都被听见，让每一份数据都有价值。</p>
+	            </div>
+
+	            <div class="footer-section">
+	                <h4>快速导航</h4>
+	                <ul>
+	                    <li><a href="{{ url_for('index') }}">首页</a></li>
+	                    <li><a href="{{ url_for('question_square') }}">问卷广场</a></li>
+	                    <li><a href="{{ url_for('create_question') }}">创建问卷</a></li>
+	                    <li><a href="{{ url_for('my_questions') }}">我的问卷</a></li>
+	                    <li><a href="#">数据统计</a></li>
+	                    <li><a href="#">帮助中心</a></li>
+	                </ul>
+	            </div>
+
+	            <div class="footer-section">
+	                <h4>关注我们</h4>
+	                <ul>
+	                    <li><span class="icon">📱</span> 微信公众号</li>
+	                    <li><span class="icon">🐦</span> 新浪微博</li>
+	                    <li><span class="icon">💬</span> 知乎专栏</li>
+	                    <li><span class="icon">📚</span> 知乎专栏</li>
+	                </ul>
+	            </div>
+
+	            <div class="footer-section">
+	                <h4>获取最新问卷推送</h4>
+	                <p>订阅后将第一时间收到热门问卷推送</p>
+	                <div class="subscribe">
+	                    <input type="email" placeholder="输入您的邮箱">
+	                    <button>→</button>
+	                </div>
+	            </div>
+	        </div>
+	        <div class="copyright">
+	            <p>© 2025 问卷广场 · All Rights Reserved</p>
+	        </div>
+	    </footer>
+</body>
+</html>
