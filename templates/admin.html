@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}管理后台{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+    <div class="admin-container">
+        <div class="admin-header">
+            <div class="header-left">
+                <h1>问卷管理</h1>
+                <p>管理您创建的所有问卷</p>
+            </div>
+        </div>
+        
+        <div class="admin-stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ surveys|length }}</div>
+                <div class="stat-label">问卷总数</div>
+            </div>
+            <div class="stat-card active">
+                <div class="stat-number">{{ surveys|selectattr('is_active')|list|length }}</div>
+                <div class="stat-label">进行中</div>
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-number">{{ surveys|rejectattr('is_active')|list|length }}</div>
+                <div class="stat-label">已结束</div>
+            </div>
+        </div>
+        
+        <div class="survey-list">
+            <table class="survey-table">
+                <thead>
+                    <tr>
+                        <th>问卷标题</th>
+                        <th>分类</th>
+                        <th>作者</th>
+                        <th>参与人数</th>
+                        <th>状态</th>
+                        <th>截止日期</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for survey in surveys %}
+                    <tr>
+                        <td><a href="{{ url_for('survey.view_survey', survey_id=survey.id) }}">{{ survey.title }}</a></td>
+                        <td><span class="category-tag {{ survey.category }}">{{ survey.category_label }}</span></td>
+                        <td>{{ survey.author or '匿名用户' }}</td>
+                        <td>{{ survey.response_count }}</td>
+                        <td>
+                            {% if survey.is_active %}
+                            <span class="status active">进行中</span>
+                            {% else %}
+                            <span class="status inactive">已结束</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ survey.deadline.strftime('%Y-%m-%d') if survey.deadline else '不限' }}</td>
+                        <td class="actions">
+                            <button class="btn-action view" onclick="location.href='{{ url_for('survey.view_survey', survey_id=survey.id) }}'">查看</button>
+                            <button class="btn-action results" onclick="location.href='{{ url_for('survey.view_results', survey_id=survey.id) }}'">统计</button>
+                            <button class="btn-action add" onclick="location.href='{{ url_for('survey.add_question', survey_id=survey.id) }}'">添加问题</button>
+                            <button class="btn-action toggle" onclick="toggleSurvey({{ survey.id }})">{{ '禁用' if survey.is_active else '启用' }}</button>
+                            <button class="btn-action delete" onclick="deleteSurvey({{ survey.id }})">删除</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if surveys|length == 0 %}
+                    <tr>
+                        <td colspan="7" class="empty">暂无问卷，点击上方按钮创建</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<form id="toggleForm" method="POST" style="display: none;"></form>
+<form id="deleteForm" method="POST" style="display: none;"></form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleSurvey(surveyId) {
+    if (confirm('确定要切换问卷状态吗？')) {
+        fetch(`/api/survey/${surveyId}/toggle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            alert('操作失败，请稍后重试');
+        });
+    }
+}
+
+function deleteSurvey(surveyId) {
+    if (confirm('确定要删除这个问卷吗？此操作不可撤销！')) {
+        fetch(`/api/survey/${surveyId}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            alert('操作失败，请稍后重试');
+        });
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ survey.title }} - 问卷已结束{% endblock %}
+
+{% block extra_css %}
+<style>
+    .closed-section {
+        padding: 60px 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: calc(100vh - 70px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .closed-container {
+        background: white;
+        border-radius: 24px;
+        padding: 48px;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .closed-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 24px;
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+    }
+
+    .closed-title {
+        font-size: 28px;
+        color: #1f2937;
+        margin-bottom: 12px;
+        font-weight: 700;
+    }
+
+    .closed-desc {
+        font-size: 16px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 32px;
+    }
+
+    .survey-info {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 32px;
+        text-align: left;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .info-value {
+        color: #1f2937;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+    }
+
+    .btn {
+        padding: 14px 32px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
+    }
+
+    @media (max-width: 640px) {
+        .closed-container {
+            padding: 32px 24px;
+        }
+
+        .closed-title {
+            font-size: 24px;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="closed-section">
+    <div class="closed-container">
+        <div class="closed-icon">🔒</div>
+        
+        <h1 class="closed-title">问卷已结束</h1>
+        <p class="closed-desc">
+            该问卷已被管理员关闭或已过截止日期，暂时无法继续填写。感谢您的关注！
+        </p>
+
+        <div class="survey-info">
+            <div class="info-item">
+                <span class="info-label">问卷标题</span>
+                <span class="info-value">{{ survey.title }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">参与人数</span>
+                <span class="info-value">{{ survey.response_count }} 人</span>
+            </div>
+            {% if survey.deadline %}
+            <div class="info-item">
+                <span class="info-label">截止日期</span>
+                <span class="info-value">{{ survey.deadline.strftime('%Y-%m-%d') }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="location.href='{{ url_for('survey.question_square') }}'">
+                ← 返回首页
+            </button>
+            <button class="btn btn-primary" onclick="location.href='{{ url_for('survey.my_questions') }}'">
+                我的问卷
+            </button>
+        </div>
+    </div>
+</section>
+{% endblock %}

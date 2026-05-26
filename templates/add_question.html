@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+
+{% block title %}添加问题 - {{ survey.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .create-section {
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: calc(100vh - 70px);
+    }
+
+    .create-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    /* 页面标题 */
+    .create-header {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .create-header h1 {
+        font-size: 28px;
+        color: #1f2937;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .create-header p {
+        font-size: 15px;
+        color: #6b7280;
+    }
+
+    /* 表单卡片 */
+    .create-form {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 表单组 */
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 15px;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .form-group .required {
+        color: #ef4444;
+        margin-left: 4px;
+    }
+
+    /* 文本框样式 */
+    .form-group textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 15px;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 80px;
+        transition: all 0.3s;
+        box-sizing: border-box;
+    }
+
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-group textarea::placeholder {
+        color: #9ca3af;
+    }
+
+    /* 选择框样式 */
+    .form-group select {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 15px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+
+    .form-group select:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* 选项容器 */
+    #optionsContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .option-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .option-row input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s;
+    }
+
+    .option-row input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-remove {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 10px;
+        background: #fee2e2;
+        color: #dc2626;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-remove:hover {
+        background: #fecaca;
+        transform: scale(1.05);
+    }
+
+    .btn-add-option {
+        width: 100%;
+        padding: 12px;
+        border: 2px dashed #cbd5e1;
+        border-radius: 10px;
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-add-option:hover {
+        border-color: #2563eb;
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    /* 复选框 */
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 15px;
+        color: #374151;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #2563eb;
+    }
+
+    /* 操作按钮 */
+    .form-actions {
+        display: flex;
+        gap: 16px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .btn-cancel, .btn-submit {
+        flex: 1;
+        padding: 14px 24px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-cancel {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .btn-cancel:hover {
+        background: #e5e7eb;
+        transform: translateY(-1px);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* 选项提示 */
+    .options-hint {
+        font-size: 13px;
+        color: #9ca3af;
+        margin-top: 6px;
+        display: block;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 640px) {
+        .create-section {
+            padding: 24px 12px;
+        }
+
+        .create-header {
+            padding: 24px 16px;
+        }
+
+        .create-header h1 {
+            font-size: 22px;
+        }
+
+        .create-form {
+            padding: 24px 16px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="create-section">
+    <div class="create-container">
+        <!-- 页面标题 -->
+        <div class="create-header">
+            <h1>✏️ 添加问题</h1>
+            <p>为问卷 <strong>"{{ survey.title }}"</strong> 添加新问题</p>
+        </div>
+
+        <!-- 表单 -->
+        <form method="POST" class="create-form" id="questionForm">
+            <!-- 问题内容 -->
+            <div class="form-group">
+                <label for="question_text">问题内容 <span class="required">*</span></label>
+                <textarea id="question_text" name="question_text" rows="2" required placeholder="请输入问题内容"></textarea>
+            </div>
+
+            <!-- 问题类型 -->
+            <div class="form-group">
+                <label for="question_type">问题类型</label>
+                <select id="question_type" name="question_type" onchange="toggleOptions()">
+                    <option value="single_choice">📝 单选题</option>
+                    <option value="multiple_choice">☑️ 多选题</option>
+                    <option value="text">📄 文本题</option>
+                </select>
+            </div>
+
+            <!-- 选项组 -->
+            <div class="form-group" id="optionsGroup">
+                <label>选项</label>
+                <div id="optionsContainer">
+                    <div class="option-row">
+                        <input type="text" name="options[]" placeholder="选项 1">
+                        <button type="button" class="btn-remove" onclick="removeOption(this)">-</button>
+                    </div>
+                    <div class="option-row">
+                        <input type="text" name="options[]" placeholder="选项 2">
+                        <button type="button" class="btn-remove" onclick="removeOption(this)">-</button>
+                    </div>
+                </div>
+                <button type="button" class="btn-add-option" onclick="addOption()">+ 添加选项</button>
+                <span class="options-hint">提示：至少需要2个选项，支持添加多个选项</span>
+            </div>
+
+            <!-- 必填项 -->
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="is_required" checked>
+                    <span>✅ 必填项</span>
+                </label>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="location.href='{{ url_for('survey.my_questions') }}'">
+                    ← 返回我的问卷
+                </button>
+                <button type="submit" class="btn-submit">
+                    ✓ 添加问题
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+    function toggleOptions() {
+        const type = document.getElementById('question_type').value;
+        const optionsGroup = document.getElementById('optionsGroup');
+        
+        if (type === 'text') {
+            optionsGroup.style.display = 'none';
+        } else {
+            optionsGroup.style.display = 'block';
+        }
+    }
+
+    function addOption() {
+        const container = document.getElementById('optionsContainer');
+        const optionCount = container.children.length + 1;
+        
+        const optionRow = document.createElement('div');
+        optionRow.className = 'option-row';
+        optionRow.innerHTML = `
+            <input type="text" name="options[]" placeholder="选项 ${optionCount}">
+            <button type="button" class="btn-remove" onclick="removeOption(this)">-</button>
+        `;
+        
+        container.appendChild(optionRow);
+    }
+
+    function removeOption(btn) {
+        const container = document.getElementById('optionsContainer');
+        if (container.children.length > 2) {
+            btn.parentElement.remove();
+        }
+    }
+
+    // 页面加载时初始化选项显示状态
+    toggleOptions();
+</script>
+{% endblock %}

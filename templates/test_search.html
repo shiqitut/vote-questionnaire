@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>搜索测试</title>
+    <style>
+        .search-box {
+            display: flex;
+            max-width: 600px;
+            margin: 50px auto;
+            gap: 0;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            color: #9ca3af;
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            border: none;
+            font-size: 15px;
+            outline: none;
+            background: transparent;
+            z-index: 2;
+        }
+
+        .search-btn {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        #searchSuggestions {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            max-height: 280px;
+            overflow-y: auto;
+            display: none;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        #searchSuggestions.show {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 14px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .suggestion-item:hover {
+            background: #eff6ff;
+        }
+
+        .suggestion-item .icon {
+            color: #2563eb;
+            font-size: 18px;
+        }
+
+        .suggestion-item .text-wrapper {
+            flex: 1;
+        }
+
+        .suggestion-item .text {
+            color: #1f2937;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .suggestion-item .desc {
+            color: #6b7280;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .suggestion-item .category {
+            padding: 4px 12px;
+            background: #eff6ff;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #2563eb;
+        }
+
+        .suggestion-empty {
+            padding: 24px;
+            text-align: center;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-box">
+        <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索问卷标题、关键词..." class="search-input">
+            <div id="searchSuggestions"></div>
+        </div>
+        <button class="search-btn">搜索</button>
+    </div>
+
+    <script>
+        // 模拟数据
+        var surveyTitles = [
+            {"title": "测试问卷", "description": "这是一个测试问卷", "category": "study"},
+            {"title": "用户满意度调查", "description": "了解用户对产品的满意程度", "category": "work"},
+            {"title": "活动报名问卷", "description": "2024年度活动报名", "category": "activity"},
+            {"title": "学习需求调研", "description": "了解学生学习需求", "category": "study"}
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchInput = document.getElementById('searchInput');
+            var suggestions = document.getElementById('searchSuggestions');
+            
+            console.log('Survey titles:', surveyTitles);
+            console.log('Search input:', searchInput);
+
+            searchInput.addEventListener('input', function(e) {
+                var query = e.target.value.trim();
+                console.log('Input:', query);
+
+                if (!query || surveyTitles.length === 0) {
+                    suggestions.classList.remove('show');
+                    return;
+                }
+
+                var filtered = surveyTitles.filter(function(item) {
+                    return item.title.toLowerCase().includes(query.toLowerCase()) ||
+                           item.description.toLowerCase().includes(query.toLowerCase());
+                });
+
+                console.log('Filtered:', filtered);
+
+                if (filtered.length > 0) {
+                    var html = '';
+                    for (var i = 0; i < filtered.length; i++) {
+                        var item = filtered[i];
+                        var catName = {'study':'学习','work':'工作','activity':'活动','other':'其他'}[item.category] || item.category;
+                        var descHtml = item.description ? '<div class="desc">' + item.description + '</div>' : '';
+                        html += '<div class="suggestion-item" onclick="selectSuggestion(\'' + encodeURIComponent(item.title) + '\')">' +
+                                 '<span class="icon">📝</span>' +
+                                 '<div class="text-wrapper">' +
+                                 '<div class="text">' + item.title + '</div>' +
+                                 descHtml +
+                                 '</div>' +
+                                 '<span class="category">' + catName + '</span>' +
+                                 '</div>';
+                    }
+                    suggestions.innerHTML = html;
+                    suggestions.classList.add('show');
+                } else {
+                    suggestions.innerHTML = '<div class="suggestion-empty">未找到相关问卷</div>';
+                    suggestions.classList.add('show');
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-input-wrapper')) {
+                    suggestions.classList.remove('show');
+                }
+            });
+        });
+
+        function selectSuggestion(title) {
+            document.getElementById('searchInput').value = decodeURIComponent(title);
+            document.getElementById('searchSuggestions').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

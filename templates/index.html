@@ -1,280 +1,291 @@
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-	<style>
-		.form-container {
-		    background-color: white;
-		    padding: 40px;
-		    border-radius: 12px;
-		    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-		}
+{% extends 'base.html' %}
 
-		.form-container h2 {
-		    text-align: center;
-		    margin-bottom: 30px;
-		    color: #1f2937;
-		}
+{% block title %}问卷广场{% endblock %}
 
-		.form-group {
-		    margin-bottom: 20px;
-		}
+{% block content %}
+<section class="hero-section">
+    <div class="hero-container">
+        <h1>发现有趣的问卷，参与你的声音</h1>
+        <p class="hero-subtitle">海量问卷等你参与，学习 · 工作 · 活动 · 生活</p>
+        <div class="search-box-wrapper">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="txt" name="q" placeholder="搜索问卷标题、关键词..." autocomplete="off">
+                <button class="search-btn" onclick="searchSurveys()">搜索</button>
+            </div>
+            <ul id="searchSuggestions"></ul>
+        </div>
+    </div>
+</section>
 
-		.form-group label {
-		    display: block;
-		    margin-bottom: 8px;
-		    color: #374151;
-		    font-size: 14px;
-		}
+<section class="filter-section">
+    <div class="filter-container">
+        <div class="category-tabs">
+            <span class="tab {% if category == 'all' %}active{% endif %}" onclick="goToCategory('all')">全部</span>
+            <span class="tab {% if category == 'study' %}active{% endif %}" onclick="goToCategory('study')">学习</span>
+            <span class="tab {% if category == 'work' %}active{% endif %}" onclick="goToCategory('work')">工作</span>
+            <span class="tab {% if category == 'activity' %}active{% endif %}" onclick="goToCategory('activity')">活动</span>
+            <span class="tab {% if category == 'other' %}active{% endif %}" onclick="goToCategory('other')">其他</span>
+        </div>
+        <div class="sort-select">
+            <span>排序:</span>
+            <select id="sortSelect" onchange="sortSurveys()">
+                <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>最新发布</option>
+                <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>参与最多</option>
+                <option value="ending" {% if sort_by == 'ending' %}selected{% endif %}>即将结束</option>
+            </select>
+        </div>
+    </div>
+</section>
 
-		.form-group input, .form-group textarea, .form-group select {
-		    width: 100%;
-		    padding: 12px;
-		    border: 1px solid #d1d5db;
-		    border-radius: 6px;
-		    font-size: 14px;
-		}
+<section class="survey-section">
+    <div class="survey-container">
+        <div class="survey-count" id="surveyCount">共找到 {{ pagination.total if pagination else surveys|length }} 份问卷</div>
+        <div class="survey-grid" id="surveyGrid">
+            {% for survey in surveys %}
+            <div class="survey-card" data-category="{{ survey.category or 'other' }}" data-participants="{{ survey.response_count or 0 }}">
+                <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=250&fit=crop" alt="问卷封面">
+                        <span class="status-badge {{ 'active' if survey.status == 1 else 'inactive' }}">{{ '进行中' if survey.status == 1 else '已结束' }}</span>
+                    </div>
+                <div class="card-content">
+                    <h3 class="card-title">{{ survey.title }}</h3>
+                    <div class="card-meta">
+                        <div class="author">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed={{ survey.id }}" alt="作者">
+                            <span>匿名用户</span>
+                        </div>
+                        <div class="participants">
+                            <span>👥</span>
+                            <span>{{ survey.response_count or 0 }}人参与</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="deadline">截止 {{ survey.deadline or '未设置' }}</span>
+                        <span class="category-tag {{ survey.category or 'other' }}">{{ {'study': '学习', 'work': '工作', 'activity': '活动', 'other': '其他'}[survey.category or 'other'] }}</span>
+                    </div>
+                    {% if survey.status == 1 %}
+                    <button class="btn-participate" onclick="location.href='/survey/{{ survey.id }}'">立即参与</button>
+                    {% else %}
+                    <button class="btn-participate disabled">已结束</button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% if surveys|length == 0 %}
+            <div class="empty-state">
+                <img src="https://img.icons8.com/fluency/100/94a3b8/survey.png" alt="暂无问卷">
+                <p>暂无问卷，快来创建第一个吧！</p>
+            </div>
+            {% endif %}
+        </div>
 
-		.form-group textarea {
-		    height: 100px;
-		    resize: vertical;
-		}
+        {% if pagination and pagination.pages > 1 %}
+        <div class="pagination">
+            <button class="page-btn prev" {% if not pagination.has_prev %}disabled{% endif %} 
+                    onclick="goToPage({{ pagination.prev_num }})">←</button>
+            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                    <button class="page-btn {% if page_num == pagination.page %}active{% endif %}" 
+                            onclick="goToPage({{ page_num }})">{{ page_num }}</button>
+                {% else %}
+                    <span class="page-btn disabled">...</span>
+                {% endif %}
+            {% endfor %}
+            <button class="page-btn next" {% if not pagination.has_next %}disabled{% endif %} 
+                    onclick="goToPage({{ pagination.next_num }})">→</button>
+            <span class="page-info">共 {{ pagination.total }} 条 / 每页 9 条</span>
+        </div>
+        {% endif %}
+    </div>
+</section>
 
-		.btn-submit {
-		    width: 100%;
-		    padding: 14px;
-		    background-color: #2563eb;
-		    color: white;
-		    border: none;
-		    border-radius: 6px;
-		    font-size: 16px;
-		    cursor: pointer;
-		    margin-top: 10px;
-		}
+<script>
+    function goToPage(pageNum) {
+        var sortBy = document.getElementById('sortSelect').value;
+        var category = '{{ category or "all" }}';
+        window.location.href = '/square?page=' + pageNum + '&sort=' + sortBy + '&category=' + category;
+    }
 
-		.btn-submit:hover {
-		    background-color: #1d4ed8;
-		}
+    function goToCategory(cat) {
+        var sortBy = document.getElementById('sortSelect').value;
+        window.location.href = '/square?category=' + cat + '&sort=' + sortBy + '&page=1';
+    }
 
-		.link {
-		    text-align: center;
-		    margin-top: 20px;
-		    font-size: 14px;
-		    color: #6b7280;
-		}
+    function sortSurveys() {
+        var sortBy = document.getElementById('sortSelect').value;
+        var category = '{{ category or "all" }}';
+        window.location.href = '/square?sort=' + sortBy + '&category=' + category + '&page=1';
+    }
 
-		.link a {
-		    color: #2563eb;
-		    text-decoration: none;
-		}
+    // 智能搜索功能 - 支持中文输入法
+    $(document).ready(function() {
+        initSmartSearch();
+    });
 
-		.my-questions h2 {
-		    text-align: center;
-		    margin-bottom: 30px;
-		    color: #1f2937;
-		}
+    /**
+     * 初始化智能搜索
+     */
+    function initSmartSearch() {
+        bindInputEvents();
+    }
 
-		.my-questions .empty {
-		    text-align: center;
-		    color: #9ca3af;
-		    margin-bottom: 20px;
-		}
+    /**
+     * 绑定输入事件（支持中文输入法）
+     */
+    function bindInputEvents() {
+        var oTxt = document.getElementById('txt');
+        var cpLock = false;
 
-		.btn-create {
-		    display: block;
-		    width: 200px;
-		    margin: 0 auto;
-		    padding: 12px;
-		    background-color: #2563eb;
-		    color: white;
-		    text-align: center;
-		    border-radius: 6px;
-		    text-decoration: none;
-		}
+        // 中文搜索，监听compositionstart事件，如果触发该事件，就锁住输入框
+        $('#txt').on('compositionstart', function () {
+            cpLock = true;
+        });
 
-		.question-detail {
-		    max-width: 800px;
-		    margin: 0 auto;
-		}
+        // 中文搜索，监听compositionend事件，如果触发该事件，就解锁输入框
+        $('#txt').on('compositionend', function () {
+            cpLock = false;
+            var keyWord = oTxt.value;
+            if (keyWord.length > 0) {
+                searchByKeyword(keyWord);
+            } else {
+                $('#searchSuggestions').empty().hide();
+            }
+        });
 
-		.detail-header {
-		    position: relative;
-		    height: 300px;
-		    border-radius: 12px;
-		    overflow: hidden;
-		    margin-bottom: 30px;
-		}
+        // 英文搜索，监听input事件，用于处理字母搜索
+        $('#txt').on('input', function () {
+            if (!cpLock) {
+                var keyWord = oTxt.value;
+                if (keyWord.length > 0) {
+                    searchByKeyword(keyWord);
+                } else {
+                    $('#searchSuggestions').empty().hide();
+                }
+            }
+        });
 
-		.detail-header img {
-		    width: 100%;
-		    height: 100%;
-		    object-fit: cover;
-		}
+        // 绑定提示列表项点击事件
+        bindListItemClick();
 
-		.header-info {
-		    position: absolute;
-		    top: 20px;
-		    right: 20px;
-		    display: flex;
-		    gap: 10px;
-		}
+        // 点击外部关闭提示框
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.search-input-wrapper').length) {
+                $('#searchSuggestions').hide();
+            }
+        });
+    }
 
-		.detail-content h1 {
-		    font-size: 28px;
-		    color: #1f2937;
-		    margin-bottom: 15px;
-		}
+    /**
+     * 核心搜索函数（通过AJAX技术向后端发送关键词）
+     * @param {string} keyWord - 搜索关键词
+     */
+    function searchByKeyword(keyWord) {
+        var data = {"kw": keyWord};
 
-		.detail-content .meta {
-		    margin-bottom: 20px;
-		}
+        $.ajax({
+            url: "/search/keyword",
+            type: 'post',
+            dataType: 'json',
+            data: data,
+            success: function (data) {
+                if (data['code'] == 0) {
+                    renderEmptyResult();
+                }
+                if (data['code'] == 1) {
+                    var list = data['info'];
+                    renderSearchResults(list);
+                }
+            },
+            error: function() {
+                console.error('搜索请求失败');
+            }
+        });
+    }
 
-		.description {
-		    color: #4b5563;
-		    line-height: 1.8;
-		    margin-bottom: 30px;
-		}
+    /**
+     * 渲染搜索结果列表
+     * @param {Array} list - 搜索结果数组
+     */
+    function renderSearchResults(list) {
+        var oList = document.getElementById('searchSuggestions');
+        oList.innerHTML = '';
 
-		.actions {
-		    display: flex;
-		    gap: 20px;
-		}
+        var catNames = {'study':'学习','work':'工作','activity':'活动','other':'其他'};
+        
+        for (var i = 0; i < list.length; i++) {
+            var item = document.createElement('li');
+            item.setAttribute("class", "list-group-item li_style");
+            item.setAttribute("title", list[i]['title']);
+            var catName = catNames[list[i]['category']] || list[i]['category'];
+            var li_text = list[i]['title'] + '<span class="badge float-right">' + catName + '</span>';
+            item.innerHTML = li_text;
+            oList.appendChild(item);
+        }
 
-		.btn-back {
-		    background-color: white;
-		    color: #374151;
-		    padding: 10px 20px;
-		    border: 1px solid #d1d5db;
-		    border-radius: 6px;
-		    text-decoration: none;
-		    font-size: 14px;
-		}
+        $('#searchSuggestions').show();
+        bindListItemClick();
+    }
 
-		.btn-back:hover {
-		    background-color: #f9fafb;
-		}
+    /**
+     * 渲染空结果
+     */
+    function renderEmptyResult() {
+        var oList = document.getElementById('searchSuggestions');
+        oList.innerHTML = '<li class="list-group-item li_empty">暂无此问卷</li>';
+        $('#searchSuggestions').show();
+    }
 
-		footer {
-		    background-color: #1f2937;
-		    color: #9ca3af;
-		    padding: 50px 20px;
-		    margin-top: auto;
-		}
+    /**
+     * 绑定提示列表项点击事件
+     */
+    function bindListItemClick() {
+        $('.li_style').off('click').on('click', function () {
+            if ($(this).hasClass('active')) {
+                $(this).removeClass('active');
+            }
+            $(this).addClass('active');
+            var t_name = $(this).attr('title');
+            $('#txt').val(t_name);
+            $('#searchSuggestions').empty().hide();
+        });
+    }
 
-		.footer-container {
-		    max-width: 1200px;
-		    margin: 0 auto;
-		    display: grid;
-		    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		    gap: 30px;
-		}
+    function searchSurveys() {
+        var query = document.getElementById('txt').value.trim();
+        var category = '{{ category or "all" }}';
+        var sortBy = document.getElementById('sortSelect').value;
+        
+        var url = '/square?category=' + category + '&sort=' + sortBy + '&page=1';
+        if (query) {
+            url += '&q=' + encodeURIComponent(query);
+        }
+        window.location.href = url;
+    }
 
-		.footer-section h4 {
-		    color: white;
-		    margin-bottom: 20px;
-		}
+    function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-		.footer-section ul {
-		    list-style: none;
-		}
+    function getCategoryName(category) {
+        var names = {
+            'study': '学习',
+            'work': '工作',
+            'activity': '活动',
+            'other': '其他'
+        };
+        return names[category] || category;
+    }
 
-		.footer-section ul li {
-		    margin-bottom: 10px;
-		}
-
-		.footer-section ul li a {
-		    color: #9ca3af;
-		    text-decoration: none;
-		}
-
-		.footer-section ul li a:hover {
-		    color: white;
-		}
-
-		.footer-section p {
-		    margin-bottom: 15px;
-		    line-height: 1.6;
-		}
-
-		.subscribe {
-		    display: flex;
-		    margin-top: 10px;
-		}
-
-		.subscribe input {
-		    flex: 1;
-		    padding: 12px;
-		    border: none;
-		    border-radius: 6px 0 0 6px;
-		    font-size: 14px;
-		}
-
-		.subscribe button {
-		    padding: 12px 18px;
-		    background-color: #2563eb;
-		    color: white;
-		    border: none;
-		    border-radius: 0 6px 6px 0;
-		    cursor: pointer;
-		    font-size: 16px;
-		}
-
-		.copyright {
-		    text-align: center;
-		    padding-top: 30px;
-		    margin-top: 30px;
-		    border-top: 1px solid #374151;
-		    font-size: 14px;
-		}
-	</style>
-</head>
-<body>
-	<footer>
-	        <div class="footer-container">
-	            <div class="footer-section">
-	                <div class="logo">
-	                    <img src="https://img.icons8.com/color/48/000000/survey.png" alt="问卷广场">
-	                    <span>问卷广场</span>
-	                </div>
-	                <p>专业的在线问卷与投票平台，让每一个声音都被听见，让每一份数据都有价值。</p>
-	            </div>
-
-	            <div class="footer-section">
-	                <h4>快速导航</h4>
-	                <ul>
-	                    <li><a href="{{ url_for('index') }}">首页</a></li>
-	                    <li><a href="{{ url_for('question_square') }}">问卷广场</a></li>
-	                    <li><a href="{{ url_for('create_question') }}">创建问卷</a></li>
-	                    <li><a href="{{ url_for('my_questions') }}">我的问卷</a></li>
-	                    <li><a href="#">数据统计</a></li>
-	                    <li><a href="#">帮助中心</a></li>
-	                </ul>
-	            </div>
-
-	            <div class="footer-section">
-	                <h4>关注我们</h4>
-	                <ul>
-	                    <li><span class="icon">📱</span> 微信公众号</li>
-	                    <li><span class="icon">🐦</span> 新浪微博</li>
-	                    <li><span class="icon">💬</span> 知乎专栏</li>
-	                    <li><span class="icon">📚</span> 知乎专栏</li>
-	                </ul>
-	            </div>
-
-	            <div class="footer-section">
-	                <h4>获取最新问卷推送</h4>
-	                <p>订阅后将第一时间收到热门问卷推送</p>
-	                <div class="subscribe">
-	                    <input type="email" placeholder="输入您的邮箱">
-	                    <button>→</button>
-	                </div>
-	            </div>
-	        </div>
-	        <div class="copyright">
-	            <p>© 2025 问卷广场 · All Rights Reserved</p>
-	        </div>
-	    </footer>
-</body>
-</html>
+    // 点击页面其他地方关闭搜索建议
+    document.addEventListener('click', function(e) {
+        var suggestions = document.getElementById('searchSuggestions');
+        var searchBox = document.querySelector('.search-container');
+        if (suggestions && !searchBox.contains(e.target)) {
+            suggestions.classList.remove('show');
+        }
+    });
+</script>
+{% endblock %}

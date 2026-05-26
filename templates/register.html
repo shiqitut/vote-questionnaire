@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <title>注册 - 问卷系统</title>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <style>
 * {
     margin: 0;
@@ -37,7 +38,8 @@ body {
 
 .login_card {
     width: 900px;
-    height: 550px;
+    min-height: 550px;
+    max-height: 90vh;
     background: #fff;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -60,10 +62,12 @@ body {
 
 .right {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     padding: 24px;
     background: #fff;
+    overflow-y: auto;
+    max-height: 90vh;
 }
 
 .brand {
@@ -82,6 +86,7 @@ body {
     border-radius: 8px;
     background: rgba(255,255,255,0.1);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -295,7 +300,7 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
     cursor: not-allowed;
 }
 
-.btn-google {
+.btn-wechat {
     width: 100%;
     height: 42px;
     margin-top: 16px;
@@ -304,18 +309,19 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
     justify-content: center;
     gap: 8px;
     border-radius: 6px;
-    border: 1px solid #d4d4d8;
+    border: 1px solid #07C160;
     background: #fff;
     font-size: 14px;
     transition: background 0.2s;
     cursor: pointer;
+    color: #07C160;
 }
 
-.btn-google:hover {
-    background: #fafafa;
+.btn-wechat:hover {
+    background: #f0fff5;
 }
 
-.btn-google svg {
+.btn-wechat svg {
     width: 20px;
     height: 20px;
 }
@@ -433,12 +439,9 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
                     <div id="registerErrorMsg" class="error-msg" style="display: none;"></div>
                     <button type="submit" class="btn-primary">注册</button>
                 </form>
-                <button type="button" class="btn-google">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
-                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                    使用 Google 注册
+                <button type="button" class="btn-wechat">
+                    <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path d="M249.173333 335.872c0 10.922667 4.437333 21.504 11.946667 29.013333 7.509333 7.509333 18.432 11.946667 29.013333 11.946667 10.922667 0 21.504-4.437333 29.013333-11.946667 7.509333-7.509333 11.946667-18.432 11.946667-29.013333 0-10.922667-4.437333-21.504-11.946667-29.013333-7.509333-7.509333-18.432-11.946667-29.013333-11.946667-10.922667 0-21.504 4.437333-29.013333 11.946667C253.610667 314.368 249.173333 325.290667 249.173333 335.872L249.173333 335.872zM249.173333 335.872M569.344 548.864c0 8.533333 3.413333 16.725333 9.557333 22.869333 5.802667 5.802667 14.336 9.557333 22.869333 9.557333 8.533333 0 16.725333-3.413333 22.869333-9.557333 5.802667-5.802667 9.557333-14.336 9.557333-22.869333 0-8.533333-3.413333-16.725333-9.557333-22.869333-5.802667-5.802667-14.336-9.557333-22.869333-9.557333-8.533333 0-16.725333 3.413333-22.869333 9.557333C573.098667 531.797333 569.344 540.330667 569.344 548.864L569.344 548.864zM569.344 548.864M459.093333 335.872c0 10.922667 4.437333 21.504 11.946667 29.013333 7.509333 7.509333 18.432 11.946667 29.013333 11.946667 10.922667 0 21.504-4.437333 29.013333-11.946667 7.509333-7.509333 11.946667-18.432 11.946667-29.013333 0-10.922667-4.437333-21.504-11.946667-29.013333-7.509333-7.509333-18.432-11.946667-29.013333-11.946667-10.922667 0-21.504 4.437333-29.013333 11.946667C463.530667 314.368 459.093333 325.290667 459.093333 335.872L459.093333 335.872zM459.093333 335.872M842.069333 27.306667L181.930667 27.306667C94.549333 27.306667 23.893333 98.304 23.893333 186.026667l0 659.456c0 87.722667 70.997333 158.72 158.378667 158.72l660.138667 0c87.381333 0 158.378667-70.997333 158.378667-158.72L1000.789333 186.026667C1000.448 98.304 929.450667 27.306667 842.069333 27.306667L842.069333 27.306667zM390.144 681.642667c-36.864 0-66.56-7.509333-103.765333-15.018667l-103.424 51.882667 29.696-89.088c-74.069333-51.882667-118.442667-118.442667-118.442667-200.021333 0-140.970667 133.461333-251.904 296.277333-251.904 145.749333 0 273.066667 88.746667 298.666667 207.872-9.557333-1.024-18.773333-1.706667-28.672-1.706667-140.629333 0-251.904 105.130667-251.904 234.496 0 21.504 3.413333 42.325333 9.216 62.122667C408.917333 681.301333 399.701333 681.642667 390.144 681.642667L390.144 681.642667zM827.050667 785.408l22.186667 74.069333-81.237333-44.373333c-29.696 7.509333-59.392 15.018667-88.746667 15.018667-140.970667 0-251.904-96.256-251.904-215.04 0-118.442667 110.933333-215.04 251.904-215.04 133.12 0 251.562667 96.597333 251.562667 215.04C930.816 681.642667 886.442667 741.034667 827.050667 785.408L827.050667 785.408zM827.050667 785.408M730.794667 548.864c0 8.533333 3.413333 16.725333 9.557333 22.869333 5.802667 5.802667 14.336 9.557333 22.869333 9.557333 8.533333 0 16.725333-3.413333 22.869333-9.557333 5.802667-5.802667 9.557333-14.336 9.557333-22.869333 0-8.533333-3.413333-16.725333-9.557333-22.869333-5.802667-5.802667-14.336-9.557333-22.869333-9.557333-8.533333 0-16.725333 3.413333-22.869333 9.557333C734.208 531.797333 730.794667 540.330667 730.794667 548.864L730.794667 548.864zM730.794667 548.864" fill="#07C160"></path></svg>
+                    使用微信注册
                 </button>
                 <p class="login-link">已有账号？ <a id="goLogin">去登录</a></p>
             </div>
@@ -454,44 +457,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var registerErrorMsg = document.getElementById('registerErrorMsg');
     var goLogin = document.getElementById('goLogin');
 
-    function loadSavedFormData() {
-        var savedUsername = localStorage.getItem('registerUsername');
-        var savedEmail = localStorage.getItem('registerEmail');
-        var savedPassword = localStorage.getItem('registerPassword');
-
-        if (savedUsername) {
-            document.getElementById('register-username').value = savedUsername;
-        }
-        if (savedEmail) {
-            document.getElementById('register-email').value = savedEmail;
-        }
-        if (savedPassword) {
-            document.getElementById('register-password').value = savedPassword;
-        }
-    }
-
-    function saveFormData() {
-        var username = document.getElementById('register-username').value;
-        var email = document.getElementById('register-email').value;
-        var password = document.getElementById('register-password').value;
-
-        localStorage.setItem('registerUsername', username);
-        localStorage.setItem('registerEmail', email);
-        localStorage.setItem('registerPassword', password);
-    }
-
-    function clearFormData() {
-        localStorage.removeItem('registerUsername');
-        localStorage.removeItem('registerEmail');
-        localStorage.removeItem('registerPassword');
-    }
-
-    loadSavedFormData();
-
-    document.getElementById('register-username').addEventListener('input', saveFormData);
-    document.getElementById('register-email').addEventListener('input', saveFormData);
-    document.getElementById('register-password').addEventListener('input', saveFormData);
-
     registerEyeBtn.addEventListener('click', function() {
         var type = registerPasswordInput.type === 'password' ? 'text' : 'password';
         registerPasswordInput.type = type;
@@ -505,6 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     registerForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        
         var username = document.getElementById('register-username').value.trim();
         var email = document.getElementById('register-email').value.trim();
         var password = registerPasswordInput.value;
@@ -532,19 +498,42 @@ document.addEventListener('DOMContentLoaded', function() {
             registerErrorMsg.style.display = 'block';
             return;
         }
-        if (password.length < 3) {
-            registerErrorMsg.textContent = '密码长度至少为3位';
+        if (password.length < 6) {
+            registerErrorMsg.textContent = '密码长度至少为6位';
             registerErrorMsg.style.display = 'block';
             return;
         }
 
-        alert('注册成功！');
-        clearFormData();
+        axios.post('/api/register', {
+            username: username,
+            email: email,
+            password: password
+        })
+        .then(function(response) {
+            if (response.data.success) {
+                alert('注册成功！即将跳转到登录页面');
+                registerForm.reset();
+                setTimeout(function() {
+                    window.location.href = '/login';
+                }, 100);
+            } else {
+                registerErrorMsg.textContent = response.data.message;
+                registerErrorMsg.style.display = 'block';
+            }
+        })
+        .catch(function(error) {
+            console.error('注册失败:', error);
+            if (error.response && error.response.data && error.response.data.message) {
+                registerErrorMsg.textContent = error.response.data.message;
+            } else {
+                registerErrorMsg.textContent = '注册失败，请稍后重试';
+            }
+            registerErrorMsg.style.display = 'block';
+        });
     });
 
     goLogin.addEventListener('click', function() {
-        saveFormData();
-        window.location.href = 'login.html';
+        window.location.href = '/login';
     });
 });
 </script>

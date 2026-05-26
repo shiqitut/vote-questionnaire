@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}感谢您的参与{% endblock %}
+
+{% block content %}
+<style>
+.thank-you-section {
+    text-align: center;
+    padding: 60px 20px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.success-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #52c41a, #389e0d);
+    color: #fff;
+    font-size: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    box-shadow: 0 4px 20px rgba(82, 196, 26, 0.3);
+}
+
+.thank-you-section h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.thank-you-section p {
+    font-size: 16px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.thank-you-section .actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.thank-you-section .btn {
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.thank-you-section .btn-primary {
+    background: linear-gradient(135deg, #1890ff, #096dd9);
+    color: #fff;
+    border: none;
+}
+
+.thank-you-section .btn-primary:hover {
+    background: linear-gradient(135deg, #40a9ff, #1890ff);
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.thank-you-section .btn-secondary {
+    background: #fff;
+    color: #666;
+    border: 1px solid #d9d9d9;
+}
+
+.thank-you-section .btn-secondary:hover {
+    background: #f5f5f5;
+    border-color: #bfbfbf;
+}
+</style>
+
+<div class="container">
+    <div class="thank-you-section">
+        <div class="success-icon">✓</div>
+        <h1>感谢您的参与！</h1>
+        <p>您的问卷已成功提交，我们非常重视您的反馈意见。</p>
+        <div class="actions">
+            <a href="{{ url_for('survey.question_square') }}" class="btn btn-primary">返回首页</a>
+            <a href="{{ url_for('survey.view_results', survey_id=survey.id) }}" class="btn btn-secondary">查看统计结果</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

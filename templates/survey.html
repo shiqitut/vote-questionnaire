@@ -1,0 +1,442 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ survey.title }} - 填写问卷{% endblock %}
+
+{% block extra_css %}
+<style>
+    .survey-section {
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: calc(100vh - 70px);
+    }
+
+    .survey-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* 问卷头部 */
+    .survey-header {
+        background: white;
+        border-radius: 16px;
+        padding: 36px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .survey-header h1 {
+        font-size: 28px;
+        color: #1f2937;
+        margin-bottom: 12px;
+        font-weight: 700;
+    }
+
+    .survey-desc {
+        font-size: 16px;
+        color: #6b7280;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .survey-meta {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+
+    .participant-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: #eff6ff;
+        color: #2563eb;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+
+    .participant-count::before {
+        content: '👥';
+    }
+
+    /* 问题卡片 */
+    .question-section {
+        background: white;
+        border-radius: 16px;
+        padding: 28px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .question-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .question-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .question-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+        color: white;
+        border-radius: 50%;
+        font-size: 14px;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .question-text {
+        font-size: 18px;
+        color: #1f2937;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+
+    /* 选项列表 */
+    .options-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .option-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        background: #f8fafc;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+
+    .option-item:hover {
+        background: #eff6ff;
+        border-color: #dbeafe;
+    }
+
+    .option-item input[type="radio"],
+    .option-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #2563eb;
+        flex-shrink: 0;
+    }
+
+    .option-item span {
+        font-size: 16px;
+        color: #374151;
+        line-height: 1.5;
+    }
+
+    .option-item:has(input:checked) {
+        background: #eff6ff;
+        border-color: #2563eb;
+    }
+
+    /* 文本输入框 */
+    .question-section textarea {
+        width: 100%;
+        padding: 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 16px;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 120px;
+        transition: all 0.3s;
+        box-sizing: border-box;
+    }
+
+    .question-section textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .question-section textarea::placeholder {
+        color: #9ca3af;
+    }
+
+    /* 表单操作 */
+    .form-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #e5e7eb;
+        background: white;
+        border-radius: 16px;
+        padding: 24px 28px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn-back, .btn-submit {
+        padding: 14px 36px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-back {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+
+    .btn-back:hover {
+        background: #e5e7eb;
+        transform: translateY(-1px);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* 进度指示器 */
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 3px;
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #2563eb 0%, #60a5fa 100%);
+        border-radius: 3px;
+        transition: width 0.5s ease;
+    }
+
+    .progress-text {
+        text-align: center;
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+
+    /* 问题类型标签 */
+    .question-type {
+        display: inline-block;
+        padding: 4px 10px;
+        font-size: 12px;
+        border-radius: 4px;
+        margin-left: 8px;
+        font-weight: 500;
+    }
+
+    .question-type.single {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .question-type.multiple {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .question-type.essay {
+        background: #e0e7ff;
+        color: #6366f1;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 640px) {
+        .survey-section {
+            padding: 24px 12px;
+        }
+
+        .survey-header {
+            padding: 24px 16px;
+        }
+
+        .survey-header h1 {
+            font-size: 22px;
+        }
+
+        .question-section {
+            padding: 20px 16px;
+        }
+
+        .question-text {
+            font-size: 16px;
+        }
+
+        .option-item {
+            padding: 12px 16px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-back, .btn-submit {
+            width: 100%;
+            padding: 14px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="survey-section">
+    <div class="survey-container">
+        <!-- 进度指示器 -->
+        <div class="progress-text">
+            已完成 <span id="completedCount">0</span> / {{ questions|length }} 题
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+
+        <!-- 问卷头部 -->
+        <div class="survey-header">
+            <h1>{{ survey.title }}</h1>
+            {% if survey.description %}
+            <p class="survey-desc">{{ survey.description }}</p>
+            {% endif %}
+            <div class="survey-meta">
+                <span class="participant-count">{{ survey.response_count }} 人已参与</span>
+                {% if survey.deadline %}
+                <span class="participant-count" style="background: #fef3c7; color: #d97706;">
+                    ⏰ 截止: {{ survey.deadline.strftime('%Y-%m-%d') }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 问卷表单 -->
+        <form method="POST" action="{{ url_for('survey.submit_survey', survey_id=survey.id) }}" class="survey-form" id="surveyForm">
+            {% for question in questions %}
+            <div class="question-section">
+                <div class="question-header">
+                    <span class="question-number">{{ question.sort_order }}</span>
+                    <div>
+                        <span class="question-text">{{ question.content }}</span>
+                        {% if question.type == 1 %}
+                        <span class="question-type single">单选</span>
+                        {% elif question.type == 2 %}
+                        <span class="question-type multiple">多选</span>
+                        {% elif question.type == 3 %}
+                        <span class="question-type essay">问答</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if question.type == 1 %}
+                <!-- 单选题 -->
+                <div class="options-list">
+                    {% for option in question.options %}
+                    <label class="option-item">
+                        <input type="radio" name="question_{{ question.id }}" value="{{ option }}" onchange="updateProgress()">
+                        <span>{{ option }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                {% elif question.type == 2 %}
+                <!-- 多选题 -->
+                <div class="options-list">
+                    {% for option in question.options %}
+                    <label class="option-item">
+                        <input type="checkbox" name="question_{{ question.id }}" value="{{ option }}" onchange="updateProgress()">
+                        <span>{{ option }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                {% elif question.type == 3 %}
+                <!-- 文本题 -->
+                <textarea name="question_{{ question.id }}" rows="5" placeholder="请输入您的答案..." oninput="updateProgress()"></textarea>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- 操作按钮 -->
+            <div class="form-actions">
+                <button type="button" class="btn-back" onclick="location.href='{{ url_for('survey.question_square') }}'">
+                    ← 返回首页
+                </button>
+                <button type="submit" class="btn-submit">
+                    ✓ 提交问卷
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+    function updateProgress() {
+        const totalQuestions = {{ questions|length }};
+        let completed = 0;
+
+        {% for question in questions %}
+            {% if question.type in [1, 2] %}
+                const radios = document.querySelectorAll('input[name="question_{{ question.id }}"]:checked');
+                if (radios.length > 0) completed++;
+            {% else %}
+                const textarea = document.querySelector('textarea[name="question_{{ question.id }}"]');
+                if (textarea && textarea.value.trim()) completed++;
+            {% endif %}
+        {% endfor %}
+
+        document.getElementById('completedCount').textContent = completed;
+        const percentage = (completed / totalQuestions) * 100;
+        document.getElementById('progressFill').style.width = percentage + '%';
+    }
+
+    // 表单提交验证
+    document.getElementById('surveyForm').addEventListener('submit', function(e) {
+        const totalQuestions = {{ questions|length }};
+        let completed = 0;
+
+        {% for question in questions %}
+            {% if question.type in [1, 2] %}
+                const radios = document.querySelectorAll('input[name="question_{{ question.id }}"]:checked');
+                if (radios.length > 0) completed++;
+            {% else %}
+                const textarea = document.querySelector('textarea[name="question_{{ question.id }}"]');
+                if (textarea && textarea.value.trim()) completed++;
+            {% endif %}
+        {% endfor %}
+
+        if (completed < totalQuestions) {
+            e.preventDefault();
+            alert(`您还有 ${totalQuestions - completed} 题未完成，请填写完整后再提交。`);
+        }
+    });
+
+    // 页面加载时更新进度
+    updateProgress();
+</script>
+{% endblock %}

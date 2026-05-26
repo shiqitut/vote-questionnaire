@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建问卷 - 问卷系统</title>
+    <style>
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        
+        .logo img {
+            width: 36px;
+            height: 36px;
+            margin-right: 8px;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 30px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #2563eb;
+        }
+        .auth {
+            display: flex;
+            align-items: center;
+        }
+        
+        .auth a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 20px;
+            font-size: 14px;
+        }
+        
+        .auth .btn-register {
+            background-color: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+        }
+
+        .main {
+            padding: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #71717a;
+            font-size: 14px;
+            text-decoration: none;
+            margin-bottom: 24px;
+        }
+
+        .back-link:hover {
+            color: #3f3f46;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 100px;
+            right: 100px;
+            height: 2px;
+            background: #e4e4e7;
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e4e4e7;
+            color: #71717a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .step.completed .step-number {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        .step.completed .step-number::after {
+            content: '\2714';
+        }
+
+        .step-title {
+            font-size: 14px;
+            color: #71717a;
+        }
+
+        .step.active .step-title {
+            color: #18181b;
+            font-weight: 600;
+        }
+
+        .step.completed .step-title {
+            color: #22c55e;
+            font-weight: 500;
+        }
+
+        .form-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .form-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #18181b;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 24px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #18181b;
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: #ef4444;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d4d4d8;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 2px rgba(90, 103, 216, 0.2);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d4d4d8;
+            border-radius: 6px;
+            font-size: 14px;
+            min-height: 120px;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 2px rgba(90, 103, 216, 0.2);
+        }
+
+        .character-count {
+            text-align: right;
+            font-size: 12px;
+            color: #a1a1aa;
+            margin-top: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e4e4e7;
+        }
+
+        .btn-secondary {
+            background: #e4e4e7;
+            color: #3f3f46;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #d4d4d8;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .category-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .category-btn {
+            padding: 8px 16px;
+            border: 1px solid #d4d4d8;
+            background: #fff;
+            color: #71717a;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+            border-color: #5a67d8;
+            color: #5a67d8;
+        }
+
+        .category-btn.active {
+            background: #5a67d8;
+            color: #fff;
+            border-color: #5a67d8;
+        }
+
+        .result-option {
+            border: 1px solid #d4d4d8;
+            border-radius: 6px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .result-option:hover {
+            border-color: #5a67d8;
+        }
+
+        .result-option.active {
+            border-color: #5a67d8;
+            background: #eff6ff;
+        }
+
+        .result-option-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #18181b;
+        }
+
+        .result-option-desc {
+            font-size: 12px;
+            color: #71717a;
+        }
+
+        .result-options-container {
+            display: flex;
+            gap: 16px;
+        }
+
+        .result-options-container .result-option {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .toast {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #ef4444;
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            animation: slideDown 0.5s ease forwards;
+        }
+
+        .toast.error {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ef4444;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .toast-message {
+            font-size: 14px;
+            color: #dc2626;
+        }
+
+        .toast.slide-out {
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-50%) translateY(-100px);
+                opacity: 0;
+            }
+        }
+
+        .question-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e4e4e7;
+        }
+
+        .question-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .question-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #18181b;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: #f1f5f9;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #71717a;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #e2e8f0;
+            color: #3f3f46;
+        }
+
+        .action-btn.delete:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .question-type-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .type-btn {
+            padding: 6px 12px;
+            border: 1px solid #d4d4d8;
+            background: #fff;
+            color: #71717a;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .type-btn.active {
+            background: #eff6ff;
+            color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .type-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d4d4d8;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .question-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-radio {
+            width: 16px;
+            height: 16px;
+            accent-color: #3b82f6;
+        }
+
+        .option-input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid #d4d4d8;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .option-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .remove-option-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: #fef2f2;
+            color: #dc2626;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .remove-option-btn:hover {
+            background: #fee2e2;
+        }
+
+        .add-option-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: #3b82f6;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .add-option-btn:hover {
+            color: #2563eb;
+        }
+
+        .required-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-top: 16px;
+            border-top: 1px solid #e4e4e7;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e4e4e7;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #3b82f6;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #18181b;
+        }
+
+        .add-question-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 16px;
+            border: 2px dashed #e4e4e7;
+            text-align: center;
+        }
+
+        .add-question-section h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #71717a;
+            margin-bottom: 16px;
+        }
+
+        .add-question-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .add-question-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            border: 1px solid #3b82f6;
+            background: #fff;
+            color: #3b82f6;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-question-btn:hover {
+            background: #eff6ff;
+        }
+
+        .question-count {
+            text-align: right;
+            font-size: 13px;
+            color: #71717a;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #18181b;
+            margin-bottom: 16px;
+        }
+
+        .question-content.collapsed {
+            display: none;
+        }
+
+        .essay-hint {
+            padding: 10px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 16px;
+        }
+
+        .preview-section {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .preview-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #18181b;
+            margin-bottom: 16px;
+        }
+
+        .preview-header {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .preview-title-text {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .preview-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .preview-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        #preview-question-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #18181b;
+        }
+
+        #preview-question-subtitle {
+            font-size: 13px;
+            color: #71717a;
+        }
+
+        .preview-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #e4e4e7;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            color: #71717a;
+        }
+
+        #preview-questions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .preview-question-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .question-preview-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .question-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .question-type {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .question-preview-content {
+            font-size: 14px;
+            color: #18181b;
+            padding-left: 32px;
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <img src="https://img.icons8.com/color/48/000000/survey.png" alt="问卷广场">
+                <span>问卷广场</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('survey.question_square') }}">首页</a></li>
+                    <li><a href="{{ url_for('survey.create_question') }}">创建问卷</a></li>
+                    <li><a href="{{ url_for('survey.my_questions') }}">我的问卷</a></li>
+                    <!-- <li><a href="{{ url_for('survey.question_square') }}">个人中心</a></li> -->
+                </ul>
+            </nav>
+            <div class="auth">
+                <a href="{{ url_for('login_page.login_page_view') }}">登录</a>
+                <a href="{{ url_for('register_page.register_page_view') }}" class="btn-register">注册</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <a href="#" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            返回首页
+        </a>
+
+        <form id="surveyForm" method="POST" action="{{ url_for('survey.create_question') }}">
+        <div class="steps">
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-title">基础信息</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-title">题目管理</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-title">发布设置</div>
+            </div>
+        </div>
+
+        <!-- 步骤1：基础信息 -->
+        <div class="form-container active" id="form1">
+            <h2 class="form-title">基础信息</h2>
+
+            <div class="form-group">
+                <label class="form-label required">问卷标题</label>
+                <input type="text" class="form-input" name="title" placeholder="请输入问卷标题（最多50字）" maxlength="50">
+                <div class="character-count">0/50</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">问卷描述</label>
+                <textarea class="form-textarea" name="description" placeholder="请输入问卷描述，帮助参与者了解本次调查的目的..." maxlength="500"></textarea>
+                <div class="character-count">0/500</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label class="form-label">问卷分类</label>
+                    <input type="hidden" name="category" value="study">
+                    <div class="category-buttons">
+                        <button class="category-btn active" data-category="study" type="button">学习</button>
+                        <button class="category-btn" data-category="work" type="button">工作</button>
+                        <button class="category-btn" data-category="activity" type="button">活动</button>
+                        <button class="category-btn" data-category="other" type="button">其他</button>
+                    </div>
+                </div>
+                <div class="form-group flex-1">
+                    <label class="form-label required">截止时间</label>
+                    <input type="date" class="form-input" name="deadline" id="deadlineInput">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">结果公开设置</label>
+                <div class="result-options-container">
+                    <div class="result-option active">
+                        <div class="result-option-title">公开结果</div>
+                        <div class="result-option-desc">所有人可查看统计结果</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-secondary cancel-btn" type="button">取消</button>
+                <button class="btn btn-primary" id="nextBtn1" type="button">下一步</button>
+            </div>
+        </div>
+
+        <!-- 步骤2：题目管理 -->
+        <div class="form-container" id="form2">
+            <div class="section-title">题目管理</div>
+            <div class="question-count">共 <span id="questionCount">1</span> 道题</div>
+
+            <div id="questionsList">
+                <div class="question-container" data-question-id="1">
+                    <div class="question-header">
+                        <div style="display: flex; align-items: center;">
+                            <div class="question-number">1</div>
+                            <span class="question-title">未命名题目</span>
+                        </div>
+                        <div class="question-actions">
+                            <button class="action-btn move-up" title="上移"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+                            <button class="action-btn move-down" title="下移"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></button>
+                            <button class="action-btn collapse" title="折叠"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg></button>
+                            <button class="action-btn delete" title="删除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+                        </div>
+                    </div>
+
+                    <div class="question-content">
+                        <div class="question-type-buttons">
+                            <button class="type-btn active" data-type="single" type="button">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>
+                                单选题
+                            </button>
+                            <button class="type-btn" data-type="multiple" type="button">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19H9"/></svg>
+                                多选题
+                            </button>
+                            <button class="type-btn" data-type="essay" type="button">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17h16M4 12h16M4 7h16"/></svg>
+                                简答题
+                            </button>
+                        </div>
+                        <input type="hidden" class="question-type-input" name="question_type[]" value="single">
+
+                        <input type="text" class="question-input" name="question_text[]" placeholder="请输入题目内容..." oninput="updateQuestionTitle(this)">
+
+                        <div class="options-list">
+                            <div class="option-item">
+                                <input type="radio" class="option-radio" name="q1_option" checked>
+                                <input type="text" class="option-input" name="options_0[]" placeholder="选项1" value="选项1">
+                                <button class="remove-option-btn">×</button>
+                            </div>
+                            <div class="option-item">
+                                <input type="radio" class="option-radio" name="q1_option">
+                                <input type="text" class="option-input" name="options_0[]" placeholder="选项2" value="选项2">
+                                <button class="remove-option-btn">×</button>
+                            </div>
+                        </div>
+
+                        <button class="add-option-btn" type="button">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                            添加选项
+                        </button>
+
+                        <div class="required-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">必填</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="add-question-section">
+                <h3>添加题目</h3>
+                <div class="add-question-buttons">
+                    <button class="add-question-btn" data-type="single" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        + 单选题
+                    </button>
+                    <button class="add-question-btn" data-type="multiple" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        + 多选题
+                    </button>
+                    <button class="add-question-btn" data-type="essay" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        + 简答题
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-secondary" id="prevBtn2" type="button">上一步</button>
+                <button class="btn btn-primary" id="nextBtn2" type="button">下一步</button>
+            </div>
+        </div>
+
+        <!-- 步骤3：发布设置 -->
+        <div class="form-container" id="form3">
+            <h2 class="form-title">发布设置</h2>
+
+            <div class="preview-section">
+                <h3 class="preview-title">发布前预览</h3>
+                
+                <div class="preview-header">
+                    <div class="preview-title-text">
+                        <span class="preview-number">1</span>
+                        <div class="preview-info">
+                            <div id="preview-question-title">问卷标题</div>
+                            <div id="preview-question-subtitle">未填写标题</div>
+                        </div>
+                    </div>
+                    <div class="preview-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/></svg>
+                            <span id="preview-category">未选择分类</span>
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M18 9h-6M18 9l-3 3M18 9l-3-3"/></svg>
+                            <span id="preview-deadline">未设置截止时间</span>
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span id="preview-question-count">0 道题</span>
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <span id="preview-result-setting">公开结果</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div id="preview-questions">
+                    <div class="preview-question-item">
+                        <div class="question-preview-header">
+                            <span class="question-badge">1</span>
+                            <span class="question-type">单选题 · 必填</span>
+                        </div>
+                        <div class="question-preview-content">未填写题目内容</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="prevBtn3">上一步</button>
+                <button type="submit" class="btn btn-success" id="submitBtn">立即发布</button>
+            </div>
+        </div>
+        </form>
+    </main>
+
+    <script>
+        // 字符计数
+        const titleInput = document.querySelector('input[placeholder="请输入问卷标题（最多50字）"]');
+        if (titleInput) {
+            const titleCount = titleInput.parentElement.querySelector('.character-count');
+            titleInput.addEventListener('input', function() {
+                const length = this.value.length;
+                titleCount.textContent = `${length}/50`;
+            });
+        }
+
+        const descInput = document.querySelector('textarea[placeholder="请输入问卷描述，帮助参与者了解本次调查的目的..."]');
+        if (descInput) {
+            const descCount = descInput.parentElement.querySelector('.character-count');
+            descInput.addEventListener('input', function() {
+                const length = this.value.length;
+                descCount.textContent = `${length}/500`;
+            });
+        }
+
+        // 分类按钮切换
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const categoryInput = document.querySelector('input[name="category"]');
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                if (categoryInput) {
+                    categoryInput.value = this.dataset.category;
+                }
+            });
+        });
+
+        // 结果选项切换
+        const resultOptions = document.querySelectorAll('.result-option');
+        resultOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                resultOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 更新题目数量
+        function updateQuestionCount() {
+            const questionsList = document.getElementById('questionsList');
+            const count = questionsList.children.length;
+            document.getElementById('questionCount').textContent = count;
+            
+            // 更新所有题目的序号
+            const questionContainers = questionsList.querySelectorAll('.question-container');
+            questionContainers.forEach((container, index) => {
+                container.querySelector('.question-number').textContent = index + 1;
+                container.dataset.questionId = index + 1;
+                
+                // 更新选项的name属性
+                const optionRadios = container.querySelectorAll('.option-radio');
+                optionRadios.forEach(radio => {
+                    radio.name = `q${index + 1}_option`;
+                });
+            });
+        }
+
+        // 绑定选项删除按钮事件
+        function setupOptionRemoveButtons(optionsList) {
+            const removeButtons = optionsList.querySelectorAll('.remove-option-btn');
+            removeButtons.forEach(btn => {
+                btn.removeEventListener('click', handleOptionRemove);
+                btn.addEventListener('click', handleOptionRemove);
+            });
+            
+            function handleOptionRemove() {
+                const optionItem = this.parentElement;
+                const list = optionItem.parentElement;
+                const optionItems = list.querySelectorAll('.option-item');
+                
+                if (optionItems.length > 1) {
+                    list.removeChild(optionItem);
+                    updateRemoveButtons(list);
+                }
+            }
+        }
+
+        // 添加选项
+        function setupAddOption(questionContainer) {
+            const addOptionBtn = questionContainer.querySelector('.add-option-btn');
+            addOptionBtn.addEventListener('click', function() {
+                const optionsList = questionContainer.querySelector('.options-list');
+                const optionCount = optionsList.children.length;
+                
+                // 获取当前题目类型
+                const activeTypeBtn = questionContainer.querySelector('.type-btn.active');
+                const type = activeTypeBtn ? activeTypeBtn.dataset.type : 'single';
+                
+                // 根据类型决定输入类型
+                const inputType = type === 'multiple' ? 'checkbox' : 'radio';
+                const inputClass = type === 'multiple' ? 'option-checkbox' : 'option-radio';
+                
+                // 获取问题索引
+                const questionsList = document.getElementById('questionsList');
+                const questionIndex = Array.from(questionsList.children).indexOf(questionContainer);
+                
+                const newOption = document.createElement('div');
+                newOption.className = 'option-item';
+                newOption.innerHTML = `
+                    <input type="${inputType}" class="${inputClass}" name="q${questionIndex + 1}_option">
+                    <input type="text" class="option-input" name="options_${questionIndex}[]" placeholder="选项${optionCount + 1}" value="选项${optionCount + 1}">
+                    <button class="remove-option-btn">×</button>
+                `;
+                optionsList.appendChild(newOption);
+
+                updateRemoveButtons(optionsList);
+                setupOptionRemoveButtons(optionsList);
+            });
+        }
+
+        // 更新移除按钮显示状态
+        function updateRemoveButtons(optionsList) {
+            const removeButtons = optionsList.querySelectorAll('.remove-option-btn');
+            const optionItems = optionsList.querySelectorAll('.option-item');
+            
+            removeButtons.forEach((btn, index) => {
+                btn.style.display = optionItems.length > 1 ? 'flex' : 'none';
+            });
+        }
+
+        // 题目类型切换
+        function setupTypeButtons(questionContainer) {
+            const typeButtons = questionContainer.querySelectorAll('.type-btn');
+            const optionsList = questionContainer.querySelector('.options-list');
+            const addOptionBtn = questionContainer.querySelector('.add-option-btn');
+            
+            typeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    typeButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const type = this.dataset.type;
+                    if (type === 'essay') {
+                        optionsList.style.display = 'none';
+                        addOptionBtn.style.display = 'none';
+                    } else {
+                        optionsList.style.display = 'flex';
+                        optionsList.style.flexDirection = 'column';
+                        optionsList.style.gap = '8px';
+                        addOptionBtn.style.display = 'flex';
+                    }
+                    
+                    // 切换选项类型：单选/多选
+                    const optionInputs = optionsList.querySelectorAll('.option-radio, .option-checkbox');
+                    optionInputs.forEach(input => {
+                        if (type === 'multiple') {
+                            input.type = 'checkbox';
+                            input.className = 'option-checkbox';
+                        } else if (type === 'single') {
+                            input.type = 'radio';
+                            input.className = 'option-radio';
+                        }
+                    });
+                    
+                    // 更新隐藏的问题类型输入框
+                    const typeInput = questionContainer.querySelector('.question-type-input');
+                    if (typeInput) {
+                        typeInput.value = type;
+                    }
+                });
+            });
+        }
+
+        // 折叠/展开题目
+        function setupCollapse(questionContainer) {
+            const collapseBtn = questionContainer.querySelector('.collapse');
+            const content = questionContainer.querySelector('.question-content');
+            
+            collapseBtn.addEventListener('click', function() {
+                content.classList.toggle('collapsed');
+            });
+        }
+
+        // 删除题目
+        function setupDelete(questionContainer) {
+            const deleteBtn = questionContainer.querySelector('.delete');
+            deleteBtn.addEventListener('click', function() {
+                const questionsList = document.getElementById('questionsList');
+                if (questionsList.children.length > 1) {
+                    questionsList.removeChild(questionContainer);
+                    updateQuestionCount();
+                    setupQuestionActions();
+                }
+            });
+        }
+
+        // 移动题目
+        function setupMoveButtons(questionContainer) {
+            const moveUpBtn = questionContainer.querySelector('.move-up');
+            const moveDownBtn = questionContainer.querySelector('.move-down');
+            
+            moveUpBtn.addEventListener('click', function() {
+                const questionsList = document.getElementById('questionsList');
+                const containers = Array.from(questionsList.children);
+                const currentIndex = containers.indexOf(questionContainer);
+                if (currentIndex > 0) {
+                    questionsList.insertBefore(questionContainer, containers[currentIndex - 1]);
+                    updateQuestionCount();
+                    setupQuestionActions();
+                    setupMoveButtons(questionContainer);
+                }
+            });
+            
+            moveDownBtn.addEventListener('click', function() {
+                const questionsList = document.getElementById('questionsList');
+                const containers = Array.from(questionsList.children);
+                const currentIndex = containers.indexOf(questionContainer);
+                if (currentIndex < containers.length - 1) {
+                    questionsList.insertBefore(questionContainer, containers[currentIndex + 2] || null);
+                    updateQuestionCount();
+                    setupQuestionActions();
+                    setupMoveButtons(questionContainer);
+                }
+            });
+        }
+
+        // 设置题目操作事件
+        function setupQuestionActions() {
+            const questionsList = document.getElementById('questionsList');
+            const containers = questionsList.querySelectorAll('.question-container');
+            
+            containers.forEach((container, index) => {
+                const moveUpBtn = container.querySelector('.move-up');
+                const moveDownBtn = container.querySelector('.move-down');
+                
+                moveUpBtn.style.display = index === 0 ? 'none' : 'flex';
+                moveDownBtn.style.display = index === containers.length - 1 ? 'none' : 'flex';
+            });
+        }
+
+        // 创建新题目
+        function createQuestion(type) {
+            const questionsList = document.getElementById('questionsList');
+            const questionCount = questionsList.children.length;
+            const newId = questionCount + 1;
+            
+            const isEssay = type === 'essay';
+            
+            let optionsHtml = '';
+            if (!isEssay) {
+                // 根据题目类型决定输入类型
+                const inputType = type === 'multiple' ? 'checkbox' : 'radio';
+                const inputClass = type === 'multiple' ? 'option-checkbox' : 'option-radio';
+                
+                optionsHtml = `
+                    <div class="options-list">
+                        <div class="option-item">
+                            <input type="${inputType}" class="${inputClass}" name="q${newId}_option" checked>
+                            <input type="text" class="option-input" name="options_${questionCount}[]" placeholder="选项1" value="选项1">
+                            <button class="remove-option-btn">×</button>
+                        </div>
+                        <div class="option-item">
+                            <input type="${inputType}" class="${inputClass}" name="q${newId}_option">
+                            <input type="text" class="option-input" name="options_${questionCount}[]" placeholder="选项2" value="选项2">
+                            <button class="remove-option-btn">×</button>
+                        </div>
+                    </div>
+                    <button class="add-option-btn" type="button">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        添加选项
+                    </button>
+                `;
+            }
+            
+            const newQuestion = document.createElement('div');
+            newQuestion.className = 'question-container';
+            newQuestion.dataset.questionId = newId;
+            newQuestion.innerHTML = `
+                <div class="question-header">
+                    <div style="display: flex; align-items: center;">
+                        <div class="question-number">${newId}</div>
+                        <span class="question-title">未命名题目</span>
+                    </div>
+                    <div class="question-actions">
+                        <button class="action-btn move-up" title="上移" style="display: none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+                        <button class="action-btn move-down" title="下移"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></button>
+                        <button class="action-btn collapse" title="折叠"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg></button>
+                        <button class="action-btn delete" title="删除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+                    </div>
+                </div>
+                <div class="question-content">
+                    <div class="question-type-buttons">
+                        <button class="type-btn ${type === 'single' ? 'active' : ''}" data-type="single" type="button">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>
+                            单选题
+                        </button>
+                        <button class="type-btn ${type === 'multiple' ? 'active' : ''}" data-type="multiple" type="button">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 19H9"/></svg>
+                            多选题
+                        </button>
+                        <button class="type-btn ${type === 'essay' ? 'active' : ''}" data-type="essay" type="button">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17h16M4 12h16M4 7h16"/></svg>
+                            简答题
+                        </button>
+                    </div>
+                    <input type="hidden" class="question-type-input" name="question_type[]" value="${type}">
+                    <input type="text" class="question-input" name="question_text[]" placeholder="请输入题目内容..." oninput="updateQuestionTitle(this)">
+                    ${optionsHtml}
+                    ${isEssay ? '<div class="essay-hint">简答题：参与者将在此处输入文字回答</div>' : ''}
+                    <div class="required-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">必填</span>
+                    </div>
+                </div>
+            `;
+            
+            questionsList.appendChild(newQuestion);
+            
+            if (!isEssay) {
+                const optionsList = newQuestion.querySelector('.options-list');
+                setupOptionRemoveButtons(optionsList);
+                updateRemoveButtons(optionsList);
+                setupAddOption(newQuestion);
+            }
+            setupTypeButtons(newQuestion);
+            setupCollapse(newQuestion);
+            setupDelete(newQuestion);
+            setupMoveButtons(newQuestion);
+            updateQuestionCount();
+            setupQuestionActions();
+        }
+
+        // 添加题目按钮事件
+        const addQuestionButtons = document.querySelectorAll('.add-question-btn');
+        addQuestionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const type = this.dataset.type;
+                createQuestion(type);
+            });
+        });
+
+        // 收集问卷数据
+        function collectSurveyData() {
+            const data = {
+                title: document.querySelector('#form1 input[placeholder="请输入问卷标题（最多50字）"]').value || '未填写标题',
+                category: document.querySelector('#form1 .category-btn.active').textContent || '未选择分类',
+                deadline: document.querySelector('#form1 input[type="date"]').value || '未设置截止时间',
+                resultSetting: document.querySelector('#form1 .result-option.active .result-option-title').textContent || '公开结果',
+                questions: []
+            };
+
+            const questionContainers = document.querySelectorAll('#questionsList .question-container');
+            questionContainers.forEach((container, index) => {
+                const typeBtn = container.querySelector('.type-btn.active');
+                const type = typeBtn ? typeBtn.dataset.type : 'single';
+                const typeText = {
+                    single: '单选题',
+                    multiple: '多选题',
+                    essay: '简答题'
+                }[type] || '单选题';
+                
+                const content = container.querySelector('.question-input').value || '未填写题目内容';
+                const required = container.querySelector('.toggle-switch input').checked;
+                
+                data.questions.push({
+                    index: index + 1,
+                    type: type,
+                    typeText: typeText,
+                    content: content,
+                    required: required
+                });
+            });
+            
+            data.questionCount = data.questions.length;
+            return data;
+        }
+
+        // 更新预览区域
+        function updatePreview() {
+            const data = collectSurveyData();
+            
+            document.getElementById('preview-question-title').textContent = data.title;
+            document.getElementById('preview-question-subtitle').textContent = data.title === '未填写标题' ? '未填写标题' : data.category;
+            document.getElementById('preview-category').textContent = data.category;
+            document.getElementById('preview-deadline').textContent = data.deadline;
+            document.getElementById('preview-question-count').textContent = `${data.questionCount} 道题`;
+            document.getElementById('preview-result-setting').textContent = data.resultSetting;
+            
+            const previewQuestions = document.getElementById('preview-questions');
+            previewQuestions.innerHTML = '';
+            
+            data.questions.forEach(q => {
+                const item = document.createElement('div');
+                item.className = 'preview-question-item';
+                item.innerHTML = `
+                    <div class="question-preview-header">
+                        <span class="question-badge">${q.index}</span>
+                        <span class="question-type">${q.typeText}${q.required ? ' · 必填' : ''}</span>
+                    </div>
+                    <div class="question-preview-content">${q.content}</div>
+                `;
+                previewQuestions.appendChild(item);
+            });
+        }
+
+        // 步骤切换
+        const steps = document.querySelectorAll('.step');
+        const forms = document.querySelectorAll('.form-container');
+
+        function goToStep(stepIndex) {
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index < stepIndex) {
+                    step.classList.add('completed');
+                } else if (index === stepIndex) {
+                    step.classList.add('active');
+                }
+            });
+
+            forms.forEach((form, index) => {
+                form.classList.remove('active');
+                if (index === stepIndex) {
+                    form.classList.add('active');
+                }
+            });
+            
+            if (stepIndex === 2) {
+                updatePreview();
+            }
+        }
+
+        // 设置日期输入框的最小日期为今天
+        function setMinDate() {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            const deadlineInput = document.getElementById('deadlineInput');
+            if (deadlineInput) {
+                deadlineInput.min = todayStr;
+            }
+        }
+
+        // 检查日期是否有效（不能是过去的日期）
+        function isValidDate(dateStr) {
+            if (!dateStr) return false;
+            
+            const selectedDate = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            return selectedDate >= today;
+        }
+
+        // 实时更新题目标题
+        function updateQuestionTitle(input) {
+            const questionContainer = input.closest('.question-container');
+            const titleSpan = questionContainer.querySelector('.question-title');
+            const questionNumber = questionContainer.querySelector('.question-number').textContent;
+            
+            if (input.value.trim()) {
+                // 截取前20个字符作为标题显示
+                const displayText = input.value.trim().length > 20 
+                    ? input.value.trim().substring(0, 20) + '...' 
+                    : input.value.trim();
+                titleSpan.textContent = displayText;
+            } else {
+                titleSpan.textContent = '未命名题目';
+            }
+        }
+
+        // 显示提示消息
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                document.body.removeChild(existingToast);
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast error';
+            toast.innerHTML = `
+                <div class="toast-icon">×</div>
+                <div class="toast-message">${message}</div>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('slide-out');
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 300);
+            }, 2000);
+        }
+
+        // 下一步按钮1（基础信息 -> 题目管理）
+        document.getElementById('nextBtn1').addEventListener('click', function() {
+            const title = document.querySelector('#form1 input[placeholder="请输入问卷标题（最多50字）"]').value.trim();
+            const deadline = document.querySelector('#form1 input[type="date"]').value;
+            
+            if (!title) {
+                showToast('请填写问卷标题');
+                return;
+            }
+            
+            if (!deadline) {
+                showToast('请选择截止时间');
+                return;
+            }
+            
+            if (!isValidDate(deadline)) {
+                showToast('截止时间不能设置为过去的日期');
+                return;
+            }
+            
+            goToStep(1);
+        });
+
+        // 下一步按钮2（题目管理 -> 发布设置）
+        document.getElementById('nextBtn2').addEventListener('click', function() {
+            const questionContainers = document.querySelectorAll('#questionsList .question-container');
+            let hasEmptyQuestion = false;
+            
+            questionContainers.forEach((container) => {
+                const content = container.querySelector('.question-input').value.trim();
+                if (!content) {
+                    hasEmptyQuestion = true;
+                }
+            });
+            
+            if (hasEmptyQuestion) {
+                showToast('请填写所有题目的内容');
+                return;
+            }
+            
+            goToStep(2);
+        });
+
+        // 上一步按钮2（题目管理 -> 基础信息）
+        document.getElementById('prevBtn2').addEventListener('click', function() {
+            goToStep(0);
+        });
+
+        // 上一步按钮3（发布设置 -> 题目管理）
+        document.getElementById('prevBtn3').addEventListener('click', function() {
+            goToStep(1);
+        });
+
+        // 初始化第一个题目
+        const firstQuestion = document.querySelector('.question-container');
+        if (firstQuestion) {
+            const firstOptionsList = firstQuestion.querySelector('.options-list');
+            if (firstOptionsList) {
+                setupOptionRemoveButtons(firstOptionsList);
+                updateRemoveButtons(firstOptionsList);
+            }
+            setupAddOption(firstQuestion);
+            setupTypeButtons(firstQuestion);
+            setupCollapse(firstQuestion);
+            setupDelete(firstQuestion);
+            setupMoveButtons(firstQuestion);
+            setupQuestionActions();
+        }
+
+        // 取消按钮事件
+        const cancelButtons = document.querySelectorAll('.cancel-btn');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // 跳转到首页
+                window.location.href = "{{ url_for('survey.question_square') }}";
+            });
+        });
+
+        // 页面加载完成后设置日期输入框的最小日期
+        document.addEventListener('DOMContentLoaded', function() {
+            setMinDate();
+        });
+    </script>
+</body>
+</html>
