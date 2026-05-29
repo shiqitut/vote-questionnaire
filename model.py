@@ -1,9 +1,3 @@
-#!usr/bin/env python
-# -*- coding:utf-8 -*-
-"""
-数据模型定义文件
-基于 settings.py 中的数据库配置实现 ORM 映射
-"""
 
 from settings import db
 from datetime import datetime

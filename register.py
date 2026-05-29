@@ -1,9 +1,3 @@
-#!usr/bin/env python
-# -*- coding:utf-8 -*-
-"""
-注册蓝图模块
-处理用户注册相关的路由和逻辑
-"""
 
 from flask import Blueprint, render_template, request, jsonify
 from model import User

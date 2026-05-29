@@ -1,8 +1,3 @@
-#!usr/bin/env python
-# -*- coding:utf-8 -*-
-"""
-Flask 应用入口文件
-"""
 
 from flask import Flask, redirect, url_for
 from flask_cors import CORS

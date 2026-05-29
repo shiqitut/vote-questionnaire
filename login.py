@@ -1,9 +1,3 @@
-#!usr/bin/env python
-# -*- coding:utf-8 -*-
-"""
-登录蓝图模块
-处理用户登录相关的路由和逻辑
-"""
 
 from flask import Blueprint, render_template, request, jsonify, session
 from model import User

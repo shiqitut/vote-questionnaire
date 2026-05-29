@@ -1,9 +1,4 @@
-#!usr/bin/env python
-# -*- coding:utf-8 -*-
-"""
-问卷视图模块
-处理问卷的创建、查看、提交、结果展示等路由
-"""
+
 
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app
 from model import Survey, Question, Answer
